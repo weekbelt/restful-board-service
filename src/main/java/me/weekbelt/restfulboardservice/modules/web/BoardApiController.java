@@ -25,11 +25,11 @@ public class BoardApiController {
         webDataBinder.addValidators(createBoardFormValidator);
     }
 
-    @PostMapping("/v1/movies")
+    @PostMapping("/v1/boards")
     public ResponseEntity<?> createBoard(@RequestBody @Valid CreateBoardForm createBoardForm,
                                          Errors errors) {
         if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         Long boardId = boardService.createBoard(createBoardForm);

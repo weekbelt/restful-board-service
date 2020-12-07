@@ -30,7 +30,7 @@ class BoardApiControllerTest {
     @DisplayName("Board 생성 API")
     void createBoard() throws Exception {
         // given
-        String requestUri = "/api/v1/movies";
+        String requestUri = "/api/v1/boards";
 
         CreateBoardForm createBoardForm = CreateBoardForm.builder()
                 .title("test")
@@ -52,6 +52,36 @@ class BoardApiControllerTest {
                 .andExpect(jsonPath("title").value(createBoardForm.getTitle()))
                 .andExpect(jsonPath("content").value(createBoardForm.getContent()))
                 .andExpect(jsonPath("boardType").value(createBoardForm.getBoardType()))
+        ;
+    }
+
+    @Test
+    @DisplayName("Board 생성 API - 잘못된 요청")
+    void createBoard_BadRequest() throws Exception {
+        // given
+        String requestUri = "/api/v1/boards";
+
+        CreateBoardForm createBoardForm = CreateBoardForm.builder()
+                .title("")
+                .content("test content")
+                .boardType("NOTICE")
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post(requestUri)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(createBoardForm))
+                .accept(MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        resultActions
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$[0].objectName").exists())
+                .andExpect(jsonPath("$[0].field").exists())
+                .andExpect(jsonPath("$[0].code").exists())
+                .andExpect(jsonPath("$[0].defaultMessage").exists())
+                .andExpect(jsonPath("$[0].rejectValue").exists())
         ;
     }
 }
